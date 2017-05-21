@@ -9,8 +9,10 @@
 // Note however, that you may define your own "run" and "debug" task if you
 // prefer. In this case NetBeans will not add these tasks but you may rely on
 // your own implementation.
-apply plugin : 'war'
 
+apply plugin : 'java'
+apply plugin : 'war'
+apply plugin: 'eclipse-wtp'
 
 if (!hasProperty('mainClass')) {
     ext.mainClass = ''
@@ -19,6 +21,11 @@ if (!hasProperty('mainClass')) {
 dependencies {
     compile project(':FoundryBookService')
     compile  'org.springframework:spring-webmvc:4.3.8.RELEASE'
+    providedCompile 'javax.servlet:servlet-api:2.5'
+    runtime 'javax.servlet:jstl:1.1.2'
+
+    
+    
     // TODO: Add dependencies here
     //   but note that JUnit should have already been added in parent.gradle.
     //   By default, only the Maven Central Repository is specified in
@@ -26,4 +33,48 @@ dependencies {
     //
     // You can read more about how to add dependency here:
     //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
+}
+def tomcat_home='/opt/apache-tomcat-8.0.9'
+def tomcat_bin=tomcat_home + '/bin'
+def tomcat_start=tomcat_bin + '/startup.sh'
+def tomcat_stop=tomcat_bin + '/shutdown.sh'
+def tomcat_webapps = tomcat_home + '/webapps'
+
+
+task tom << {
+    if (project.hasProperty('start')) {
+        startTom()
+    } else if (project.hasProperty('stop')) {
+        stopTom()
+    } else if (project.hasProperty('deployNstart')) {
+        println tomcat_stop
+        println tomcat_start
+        println tomcat_webapps
+        stopTom(tomcat_stop)
+        webappsCopy(tomcat_webapps)
+        startTom(tomcat_start)
+    } else {
+        throw new RuntimeException('unrecognized option')
+    }
+}
+
+def stopTom(tomcat_stop) {
+    executeCmd(tomcat_stop)
+}
+
+def startTom(tomcat_start) {
+    executeCmd(tomcat_start)
+}
+
+
+def executeCmd(command) {
+    def proc = command.execute()
+    proc.waitFor()
+}
+
+def webappsCopy(tomcat_webapps) {
+    copy {
+        from war.archivePath // could be exploded or war itself
+        into tomcat_webapps
+    }
 }
