@@ -21,11 +21,12 @@ if (!hasProperty('mainClass')) {
 dependencies {
     compile project(':FoundryBookService')
     compile  'org.springframework:spring-webmvc:4.3.8.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-core', version: '4.2.0.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-web', version: '4.2.0.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-config', version: '4.2.0.RELEASE'
     providedCompile 'javax.servlet:servlet-api:2.5'
     runtime 'javax.servlet:jstl:1.1.2'
-
-    
-    
+   
     // TODO: Add dependencies here
     //   but note that JUnit should have already been added in parent.gradle.
     //   By default, only the Maven Central Repository is specified in
